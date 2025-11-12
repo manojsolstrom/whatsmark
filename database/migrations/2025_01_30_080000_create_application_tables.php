@@ -21,6 +21,7 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->string('color')->nullable();
+            $table->boolean('isdefault')->default(false);
             $table->timestamps();
         });
 
