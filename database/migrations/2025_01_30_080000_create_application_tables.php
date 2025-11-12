@@ -100,7 +100,10 @@ return new class extends Migration
             $table->foreignId('template_id')->nullable()->constrained('whatsapp_templates')->onDelete('set null');
             $table->enum('status', ['draft', 'scheduled', 'running', 'completed', 'paused', 'failed'])->default('draft');
             $table->boolean('is_sent')->default(false);
+            $table->boolean('send_now')->default(false);
+            $table->boolean('pause_campaign')->default(false);
             $table->timestamp('scheduled_at')->nullable();
+            $table->timestamp('scheduled_send_time')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->integer('total_contacts')->default(0);
