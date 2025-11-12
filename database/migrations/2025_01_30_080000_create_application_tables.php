@@ -69,6 +69,17 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Create whatsapp_templates BEFORE campaigns (to avoid foreign key errors)
+        Schema::create('whatsapp_templates', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('language')->default('en');
+            $table->enum('category', ['MARKETING', 'UTILITY', 'AUTHENTICATION'])->default('MARKETING');
+            $table->enum('status', ['APPROVED', 'PENDING', 'REJECTED'])->default('PENDING');
+            $table->json('components')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -94,16 +105,6 @@ return new class extends Migration
             $table->enum('status', ['pending', 'sent', 'delivered', 'read', 'failed'])->default('pending');
             $table->text('error_message')->nullable();
             $table->timestamp('sent_at')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('whatsapp_templates', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('language')->default('en');
-            $table->enum('category', ['MARKETING', 'UTILITY', 'AUTHENTICATION'])->default('MARKETING');
-            $table->enum('status', ['APPROVED', 'PENDING', 'REJECTED'])->default('PENDING');
-            $table->json('components')->nullable();
             $table->timestamps();
         });
 
