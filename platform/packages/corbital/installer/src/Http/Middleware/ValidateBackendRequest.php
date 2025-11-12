@@ -18,12 +18,7 @@ class ValidateBackendRequest
 
     public function handle(Request $request, Closure $next): Response
     {
-        // Validate the request
-        $result = $this->updateChecker->validateRequest();
-        if (! $result) {
-            return redirect()->route('validate');
-        }
-
+        // License validation bypassed - allow all requests
         return $next($request);
     }
 }
