@@ -150,8 +150,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('subject');
-            $table->text('body');
+            $table->text('body')->nullable();
+            $table->text('message')->nullable();
             $table->string('type')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->json('merge_fields_groups')->nullable();
             $table->timestamps();
         });
 
