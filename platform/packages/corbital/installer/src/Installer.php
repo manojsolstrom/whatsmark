@@ -110,8 +110,14 @@ class Installer
     {
         $file_content = file_get_contents($file);
 
+        // If file exists with content, consider it installed
+        if (!empty($file_content)) {
+            return true;
+        }
+
+        // Fallback to token verification if needed
         $token = get_setting('whats-mark.wm_verification_token');
-        if (empty($file_content) || empty($token)) {
+        if (empty($token)) {
             return false;
         }
 
