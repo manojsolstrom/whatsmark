@@ -45,6 +45,7 @@ return new class extends Migration
             $table->foreignId('status_id')->nullable()->constrained('statuses')->onDelete('set null');
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null');
             $table->text('address')->nullable();
+            $table->boolean('is_enabled')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
