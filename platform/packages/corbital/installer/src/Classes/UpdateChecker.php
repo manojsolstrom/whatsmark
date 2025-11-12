@@ -255,7 +255,10 @@ class UpdateChecker
 
     public function validateRequest()
     {
-        $token           = explode('|', get_setting('whats-mark.wm_verification_token'))[1];
+        $tokenSetting = get_setting('whats-mark.wm_verification_token');
+        $tokenParts = $tokenSetting ? explode('|', $tokenSetting) : [];
+        $token = isset($tokenParts[1]) ? $tokenParts[1] : '';
+        
         $verification_id = ! empty(get_setting('whats-mark.wm_verification_id')) ? base64_decode(get_setting('whats-mark.wm_verification_id')) : '';
 
         $id_data  = explode('|', $verification_id);
