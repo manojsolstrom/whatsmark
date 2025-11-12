@@ -85,7 +85,7 @@ class TemplateBotCreator extends Component
         return [
             'template_name'  => ['required', 'string', 'max:100', new PurifiedInput(t('sql_injection_error'))],
             'rel_type'       => 'required|string|max:50',
-            'template_id'    => 'required|integer|exists:whatsapp_templates,template_id',
+            'template_id'    => 'required|integer|exists:whatsapp_templates,id',
             'reply_type'     => 'required|integer',
             'footerInputs.*' => [count($this->footerInputs) > 0 ? 'required' : 'nullable', new PurifiedInput(t('dynamic_input_error'))],
             'headerInputs.*' => [count($this->headerInputs) > 0 ? 'required' : 'nullable', new PurifiedInput(t('dynamic_input_error'))],

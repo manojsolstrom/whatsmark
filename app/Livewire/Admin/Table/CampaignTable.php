@@ -58,7 +58,7 @@ final class CampaignTable extends PowerGridComponent
                     WHERE campaign_details.campaign_id = campaigns.id 
                     AND message_status = "read") as read_by')
             ])
-            ->leftJoin('whatsapp_templates', 'campaigns.template_id', '=', 'whatsapp_templates.template_id');
+            ->leftJoin('whatsapp_templates', 'campaigns.template_id', '=', 'whatsapp_templates.id');
     }
 
     public function relationSearch(): array

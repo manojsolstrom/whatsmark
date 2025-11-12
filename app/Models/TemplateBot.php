@@ -68,7 +68,7 @@ class TemplateBot extends Model
     public static function getTemplateBotsByRelType($relType, $message, $replyType = null)
     {
         // Start with the query on TemplateBot model
-        $query = TemplateBot::join('whatsapp_templates', 'template_bots.template_id', '=', 'whatsapp_templates.template_id')
+        $query = TemplateBot::join('whatsapp_templates', 'template_bots.template_id', '=', 'whatsapp_templates.id')
             ->select('template_bots.id AS template_bot_id', 'template_bots.*', 'whatsapp_templates.*')
             ->where('template_bots.rel_type', $relType)
             ->where('template_bots.is_bot_active', 1);

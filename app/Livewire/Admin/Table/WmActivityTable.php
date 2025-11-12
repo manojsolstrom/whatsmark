@@ -55,7 +55,7 @@ final class WmActivityTable extends PowerGridComponent
                 $join->on('wm_activity_logs.category_id', '=', 'campaigns.id')
                     ->where('wm_activity_logs.category', '=', 'campaign');
             })
-            ->leftJoin('whatsapp_templates', 'template_bots.template_id', '=', 'whatsapp_templates.template_id')
+            ->leftJoin('whatsapp_templates', 'template_bots.template_id', '=', 'whatsapp_templates.id')
             ->select(
                 'wm_activity_logs.*',
                 DB::raw("COALESCE(template_bots.name, message_bots.name, campaigns.name, '-') as name"),
