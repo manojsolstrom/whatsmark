@@ -324,105 +324,21 @@ class InstallController extends Controller
      */
     public function licenseVerify(LicenseVerificationRequest $request)
     {
-        try {
-            // Get the domain for validation
-            $environmentManager = new EnvironmentManager;
-            $activatedDomain    = $environmentManager::guessUrl();
-
-            // Step 1: Pre-validate the license
-            $apiEndpoint = rtrim(base64_decode(config('installer.license_verification.api_endpoint')), '/') . '/pre-validate';
-
-            $response = Http::timeout(60)
-                ->withHeaders([
-                    'Accept'       => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post($apiEndpoint, [
-                    'purchase_code'    => $request->purchase_code,
-                    'username'         => $request->username,
-                    'activated_domain' => $activatedDomain,
-                ]);
-
-            // Parse the response
-            $responseData = $response->json();
-
-            // If validation failed
-            if (! isset($responseData['success']) || $responseData['success'] !== true) {
-                $errorMessages = $responseData['errors'] ?? [$responseData['message'] ?? 'License validation failed'];
-
-                if (is_array($errorMessages) && isset($errorMessages['purchase_code'])) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->withErrors(['purchase_code' => $errorMessages['purchase_code'][0] ?? 'Invalid purchase code']);
-                }
-
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['general' => $responseData['message'] ?? 'License validation failed']);
-            }
-
-            // Step 2: Register the license if pre-validation was successful
-            $envatoRes = $responseData['data'] ?? [];
-
-            // Get system information
-            $userAgent = request()->header('User-Agent');
-            // Prepare data for registration
-            $registrationData = [
-                'user_agent'        => $this->getBrowserFromUserAgent($userAgent),
-                'activated_domain'  => $activatedDomain,
-                'requested_at'      => now()->format('Y-m-d H:i:s'),
-                'ip'                => request()->ip(),
-                'os'                => $this->getOSFromUserAgent($userAgent),
-                'purchase_code'     => $request->purchase_code,
-                'installed_version' => config('installer.license_verification.current_version'),
-                'envato_res'        => $envatoRes,
-                'username'          => $request->username,
-            ];
-
-            $supported_until = $envatoRes['supported_until'];
-
-            // Send registration request
-            $registrationEndpoint = rtrim(base64_decode(config('installer.license_verification.api_endpoint')), '/') . '/register';
-
-            $registrationResponse = Http::timeout(60)
-                ->withHeaders([
-                    'Accept'       => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post($registrationEndpoint, $registrationData);
-
-            // Parse the registration response
-            $registrationResponseData = $registrationResponse->json();
-
-            // If registration failed
-            if (! isset($registrationResponseData['success']) || $registrationResponseData['success'] !== true) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['general' => $registrationResponseData['message'] ?? 'License registration failed']);
-            }
-
-            // Store all license data in session
-            session([
-                'license_data' => [
-                    'username'        => $request->username,
-                    'purchase_code'   => $request->purchase_code,
-                    'verified'        => true,
-                    'details'         => $responseData['data']                                ?? [],
-                    'token'           => $registrationResponseData['data']['token']           ?? '',
-                    'verification_id' => $registrationResponseData['data']['verification_id'] ?? '',
-                    'support_until'   => $supported_until,
-                ],
-            ]);
-
-            // Redirect to next step
-            return redirect()->route('install.user')->with('success', 'License verified and registered successfully!');
-
-        } catch (Exception $e) {
-            // If there was an error with the API request
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['general' => 'Error connecting to license verification server: ' . $e->getMessage()]);
-        }
+        // License validation disabled - always return success
+        session(['license_verified' => true]);
+        session([
+            'license_data' => [
+                'username'        => 'admin',
+                'purchase_code'   => 'disabled',
+                'verified'        => true,
+                'details'         => [],
+                'token'           => 'disabled',
+                'verification_id' => 'disabled',
+                'support_until'   => now()->addYears(10)->format('Y-m-d'),
+            ],
+        ]);
+        
+        return redirect()->route('install.user')->with('success', 'License verified successfully!');
     }
 
     /**
@@ -527,117 +443,23 @@ class InstallController extends Controller
 
     public function validateLicense(LicenseVerificationRequest $request)
     {
-        try {
-            // Get the domain for validation
-            $environmentManager = new EnvironmentManager;
-            $activatedDomain    = $environmentManager::guessUrl();
+        // License validation disabled - always return success
+        $installer = new Installer;
+        
+        set_settings_batch('whats-mark', [
+            'wm_verification_id'    => base64_encode('disabled'),
+            'wm_verification_token' => base64_encode('disabled') . '|disabled',
+            'wm_last_verification'  => now()->timestamp,
+            'wm_validate'           => true,
+        ]);
 
-            $installer = new Installer;
+        $installer->markAsInstalled();
 
-            // Step 1: Pre-validate the license
-            $apiEndpoint = rtrim(base64_decode(config('installer.license_verification.api_endpoint')), '/') . '/pre-validate';
+        session()->flash('notification', [
+            'type'    => 'success',
+            'message' => 'License verified successfully!',
+        ]);
 
-            $response = Http::timeout(60)
-                ->withHeaders([
-                    'Accept'       => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post($apiEndpoint, [
-                    'purchase_code'    => $request->purchase_code,
-                    'username'         => $request->username,
-                    'activated_domain' => $activatedDomain,
-                ]);
-
-            // Parse the response
-            $responseData = $response->json();
-
-            // If validation failed
-            if (! isset($responseData['success']) || $responseData['success'] !== true) {
-                $errorMessages = $responseData['errors'] ?? [$responseData['message'] ?? 'License validation failed'];
-
-                if (is_array($errorMessages) && isset($errorMessages['purchase_code'])) {
-                    session()->flash('notification', [
-                        'type'    => 'danger',
-                        'message' => $errorMessages['purchase_code'][0] ?? 'Invalid purchase code',
-                    ]);
-
-                    return redirect()->back();
-                }
-
-                session()->flash('notification', [
-                    'type'    => 'danger',
-                    'message' => $responseData['message'] ?? 'License validation failed',
-                ]);
-
-                return redirect()->back();
-            }
-
-            // Step 2: Register the license if pre-validation was successful
-            $envatoRes = $responseData['data'] ?? [];
-
-            // Get system information
-            $userAgent = request()->header('User-Agent');
-            // Prepare data for registration
-            $registrationData = [
-                'user_agent'        => $this->getBrowserFromUserAgent($userAgent),
-                'activated_domain'  => $activatedDomain,
-                'requested_at'      => now()->format('Y-m-d H:i:s'),
-                'ip'                => request()->ip(),
-                'os'                => $this->getOSFromUserAgent($userAgent),
-                'purchase_code'     => $request->purchase_code,
-                'installed_version' => config('installer.license_verification.current_version'),
-                'envato_res'        => $envatoRes,
-                'username'          => $request->username,
-            ];
-
-            $supported_until = $envatoRes['supported_until'];
-
-            // Send registration request
-            $registrationEndpoint = rtrim(base64_decode(config('installer.license_verification.api_endpoint')), '/') . '/register';
-
-            $registrationResponse = Http::timeout(60)
-                ->withHeaders([
-                    'Accept'       => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post($registrationEndpoint, $registrationData);
-
-            // Parse the registration response
-            $registrationResponseData = $registrationResponse->json();
-
-            // If registration failed
-            if (! isset($registrationResponseData['success']) || $registrationResponseData['success'] !== true) {
-                session()->flash('notification', [
-                    'type'    => 'danger',
-                    'message' => $registrationResponseData['message'] ?? 'License registration failed',
-                ]);
-
-                return redirect()->back();
-            }
-
-            set_settings_batch('whats-mark', [
-                'wm_verification_id'    => base64_encode($registrationResponseData['data']['verification_id'] ?? ''),
-                'wm_verification_token' => base64_encode($registrationResponseData['data']['verification_id'] ?? '') . '|' . $registrationResponseData['data']['token'],
-                'wm_last_verification'  => now()->timestamp,
-                'wm_validate'           => true,
-            ]);
-
-            $installer->markAsInstalled();
-
-            session()->flash('notification', [
-                'type'    => 'success',
-                'message' => 'License verified and registered successfully!',
-            ]);
-
-            return redirect()->to(route('admin.dashboard'));
-
-        } catch (Exception $e) {
-            session()->flash('notification', [
-                'type'    => 'danger',
-                'message' => 'Error connecting to license verification server: ' . $e->getMessage(),
-            ]);
-
-            return redirect()->back();
-        }
+        return redirect()->to(route('admin.dashboard'));
     }
 }

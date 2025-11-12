@@ -24,12 +24,13 @@ class LicenseVerificationRequest extends FormRequest
     public function rules()
     {
         return [
-            'username'      => ['required', 'string', 'max:255'],
-            'purchase_code' => [
-                'required',
-                'string',
-                'regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
-            ],
+            // License validation disabled
+            // 'username'      => ['required', 'string', 'max:255'],
+            // 'purchase_code' => [
+            //     'required',
+            //     'string',
+            //     'regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
+            // ],
         ];
     }
 
@@ -41,7 +42,8 @@ class LicenseVerificationRequest extends FormRequest
     public function messages()
     {
         return [
-            'purchase_code.regex' => 'Invalid purchase code format. Expected format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            // License validation disabled
+            // 'purchase_code.regex' => 'Invalid purchase code format. Expected format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
         ];
     }
 

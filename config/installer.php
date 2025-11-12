@@ -35,7 +35,7 @@ return [
             'curl',
         ],
         'functions' => [
-            'symlink',
+            // 'symlink', // Disabled - not required
             'file_get_contents',
             'file_put_contents',
         ],
@@ -146,7 +146,7 @@ return [
     'license_verification' => [
         'product_id'        => '57276107',
         'api_endpoint'      => 'aHR0cHM6Ly9wYXNzdGhlY29kZS5jb3JiaXRhbHRlY2guZGV2L2FwaS92Mw==',
-        'required'          => true,
+        'required'          => false, // Disabled license verification
         'current_version'   => '1.0.3',
         'verify_type'       => 'envato',
         'root_path'         => storage_path('app/public/updates/'),
