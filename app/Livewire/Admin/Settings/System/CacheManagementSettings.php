@@ -283,7 +283,7 @@ class CacheManagementSettings extends Component
             // Update the current environment variable for this request
             $_ENV[$key]    = $value;
             $_SERVER[$key] = $value;
-            putenv("{$key}={$value}");
+            // putenv() is disabled on some servers, using $_ENV and $_SERVER instead
         } catch (\Exception $e) {
             report($e);
             throw new \Exception('Failed to update environment variable: ' . $e->getMessage());
