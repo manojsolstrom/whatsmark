@@ -1,0 +1,10 @@
+# Add these to crontab (crontab -e)
+
+# Laravel Scheduler (runs every minute)
+* * * * * cd /var/www/whatsmark && php artisan schedule:run >> /dev/null 2>&1
+
+# Clear logs weekly (optional)
+0 0 * * 0 cd /var/www/whatsmark && php artisan log:clear
+
+# Queue restart daily (optional, for queue reliability)
+0 2 * * * cd /var/www/whatsmark && php artisan queue:restart
