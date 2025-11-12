@@ -88,6 +88,7 @@ return new class extends Migration
             $table->string('language')->default('en');
             $table->enum('category', ['MARKETING', 'UTILITY', 'AUTHENTICATION'])->default('MARKETING');
             $table->enum('status', ['APPROVED', 'PENDING', 'REJECTED'])->default('PENDING');
+            $table->string('header_data_format')->nullable();
             $table->json('components')->nullable();
             $table->timestamps();
         });
