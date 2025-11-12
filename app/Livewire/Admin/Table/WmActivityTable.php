@@ -64,10 +64,10 @@ final class WmActivityTable extends PowerGridComponent
                     CASE
                         WHEN wm_activity_logs.category = 'template_bot'
                             AND wm_activity_logs.category_id = template_bots.id
-                            THEN (SELECT template_name FROM whatsapp_templates WHERE whatsapp_templates.template_id = template_bots.template_id LIMIT 1)
+                            THEN (SELECT name FROM whatsapp_templates WHERE whatsapp_templates.id = template_bots.template_id LIMIT 1)
                         WHEN wm_activity_logs.category = 'campaign'
                             AND wm_activity_logs.category_id = campaigns.id
-                            THEN (SELECT template_name FROM whatsapp_templates WHERE whatsapp_templates.template_id = campaigns.template_id LIMIT 1)
+                            THEN (SELECT name FROM whatsapp_templates WHERE whatsapp_templates.id = campaigns.template_id LIMIT 1)
                         ELSE '-'
                     END, '-') as template_name
                 ")

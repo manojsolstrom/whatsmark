@@ -149,12 +149,12 @@ final class CampaignTable extends PowerGridComponent
     public function filters(): array
     {
         return [
-            Filter::select('template_name', 'whatsapp_templates.template_id')
+            Filter::select('template_name', 'whatsapp_templates.id')
                 ->dataSource(
                     WhatsappTemplate::query()
                         ->select([
-                            'template_id',
-                            'template_name',
+                            'id as template_id',
+                            'name as template_name',
                         ])
                         ->get()
                         ->toArray()

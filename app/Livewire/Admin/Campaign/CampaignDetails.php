@@ -51,7 +51,7 @@ class CampaignDetails extends Component
         $campaignId = request()->route('campaignId');
 
         $this->campaign              = Campaign::findOrFail($campaignId);
-        $this->template_name         = WhatsappTemplate::select('template_name')->where('template_id', $this->campaign->template_id)->first()->template_name;
+        $this->template_name         = WhatsappTemplate::select('name as template_name')->where('id', $this->campaign->template_id)->first()->template_name;
         $this->totalCount            = CampaignDetail::where('campaign_id', $campaignId)->count();
         $this->totalContacts         = Contact::where('type', $this->campaign->rel_type)->count();
         $this->totalCampaignsPercent = ! empty($this->totalContacts) ? round(($this->totalCount / $this->totalContacts) * 100, 2) : 0;
