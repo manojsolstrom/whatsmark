@@ -52,7 +52,8 @@ class Installer
         }
 
         // Create the content with installation timestamp and app version
-        $content = sprintf(get_setting('whats-mark.wm_verification_token'));
+        $token = get_setting('whats-mark.wm_verification_token');
+        $content = $token ? sprintf($token) : 'installed-' . now()->timestamp;
 
         // Ensure storage directory exists
         $storagePath = base_path(config('installer.storage_path', 'storage'));
