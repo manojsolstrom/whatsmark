@@ -174,6 +174,7 @@ return new class extends Migration
             $table->string('code', 10)->unique();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_default')->default(false);
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
 
