@@ -31,7 +31,7 @@ class Dashboard extends Component
             'total_contact'   => Contact::count(),
             'total_campaign'  => Campaign::count(),
             'total_template'  => WhatsappTemplate::count(),
-            'todays_message'  => ChatMessage::whereDate('time_sent', Carbon::today())->count(),
+            'todays_message'  => ChatMessage::whereDate('created_at', Carbon::today())->count(),
             'contact_active'  => Contact::where('is_enabled', 1)->count(),
             'active_campaign' => Campaign::where('is_sent', 0)->count(),
             'active_template' => WhatsappTemplate::where('status', 'APPROVED')->count(),
