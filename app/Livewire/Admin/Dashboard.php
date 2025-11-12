@@ -189,13 +189,13 @@ class Dashboard extends Component
     protected function getMessageCountsByPeriod(Carbon $startDate, Carbon $endDate, string $mysqlFormat): array
     {
         return ChatMessage::select(
-            DB::raw("DATE_FORMAT(time_sent, '{$mysqlFormat}') as period"),
+            DB::raw("DATE_FORMAT(created_at, '{$mysqlFormat}') as period"),
             DB::raw('COUNT(*) as count')
         )
-            ->where('time_sent', '>=', $startDate)
-            ->where('time_sent', '<=', $endDate)
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $endDate)
             ->groupBy('period')
-            ->orderBy(DB::raw('MIN(time_sent)'))
+            ->orderBy(DB::raw('MIN(created_at)'))
             ->pluck('count', 'period')
             ->toArray();
     }
